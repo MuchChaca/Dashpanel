@@ -10,14 +10,15 @@ import (
 	"strings"
 
 	"github.com/MuchChaca/Dashpanel/src/model/dash"
+	"github.com/fatih/color"
 
 	"github.com/kataras/iris"
 	"github.com/kataras/iris/mvc"
 	"github.com/kataras/iris/sessions"
 )
 
-// DashController is the controller for "dash"
-type DashController struct {
+// ProcessController is the controller for "dash"
+type ProcessController struct {
 	Service dash.Service
 	Process dash.Process
 
@@ -28,7 +29,7 @@ type DashController struct {
 // the routes and dependencies binded.
 // You can bind custom things to the cont`roller, add new methods, add middleware,
 // add dependencies to the struct or the method(s) and more.
-func (c *DashController) BeforeActiviation(bfA mvc.BeforeActivation) {
+func (c *ProcessController) BeforeActiviation(bfA mvc.BeforeActivation) {
 	// this could be binded to a controller's function input argument
 	// if any, or struct field if any:
 	bfA.Dependencies().Add(func(ctx iris.Context) (items []dash.Process) {
@@ -38,12 +39,12 @@ func (c *DashController) BeforeActiviation(bfA mvc.BeforeActivation) {
 }
 
 // Get handles the GET: /dash route.
-func (c *DashController) Get() iris.Map {
+func (c *ProcessController) Get() iris.Map {
 	return c.LoadProcess()
 }
 
 // LoadProcess loads the processes
-func (c *DashController) LoadProcess() iris.Map {
+func (c *ProcessController) LoadProcess() iris.Map {
 	topCmd := exec.Command("pstree", "-ptc")
 	var topOut bytes.Buffer
 	topCmd.Stdout = &topOut
@@ -61,6 +62,7 @@ func (c *DashController) LoadProcess() iris.Map {
 	var allProcess map[string]interface{}
 	allProcess = make(map[string]interface{})
 
+	// Sadly, one for each process that we want a group of - names are revelant...
 	httpd := dash.TreeProcess{
 		Tree: make([]dash.Processus, 0),
 	}
@@ -69,11 +71,15 @@ func (c *DashController) LoadProcess() iris.Map {
 		Tree: make([]dash.Processus, 0),
 	}
 
+	mysqld := dash.TreeProcess{
+		Tree: make([]dash.Processus, 0),
+	}
+
+	// // To load all the other processes in as "Others"
 	// otherProc := dash.TreeProcess{
 	// 	Tree: make([]dash.Processus, 2),
 	// }
 
-	// i := 0
 	for _, str := range rgexResult {
 		str = strings.Replace(str, "-", "", -1)
 		rgex, _ = regexp.Compile("^([a-zA-Z])([a-zA-Z]|\\d)+")
@@ -82,9 +88,9 @@ func (c *DashController) LoadProcess() iris.Map {
 		rgex, _ = regexp.Compile("(\\d+)")
 		processusPID, errConv := strconv.Atoi(rgex.FindString(str))
 		if errConv != nil {
-			log.Panicln("Error in convertion PID", errConv)
+			log.Panicln(color.RedString("[ERROR]::PID had the wrong format"), errConv)
 		}
-		// index := strconv.Itoa(i)
+
 		aProcess := dash.Processus{
 			Name:    processusName,
 			PID:     processusPID,
@@ -92,25 +98,51 @@ func (c *DashController) LoadProcess() iris.Map {
 			Status:  true,
 		}
 
-		// allProcess[processusName] = append(allProcess[processusName], aProcess)
-
-		/////////
+		// Just say here and a bit lower all services we DO want
 		switch aProcess.Name {
 		case "dockerd":
 			docker.Tree = append(docker.Tree, aProcess)
 		case "httpd":
 			httpd.Tree = append(httpd.Tree, aProcess)
-		default:
+		case "mysqld":
+			mysqld.Tree = append(mysqld.Tree, aProcess)
+		default: //* To load all the other processes in as "Others"
 			// otherProc.Tree = append(otherProc.Tree, aProcess)
 		}
 		/////////
-
-		// i++
 	}
 	// fmt.Println(rgexResult)
 
+	// Explicitly say here and a bit lower all services we DO want
+	// If nothing was added we just initialize it with false status
+	if len(docker.Tree) == 0 {
+		docker.Tree = append(docker.Tree, dash.Processus{
+			Name:    "dockerd",
+			PID:     0,
+			Version: "N/A",
+			Status:  false,
+		})
+	}
+	if len(httpd.Tree) == 0 {
+		httpd.Tree = append(httpd.Tree, dash.Processus{
+			Name:    "httpd",
+			PID:     0,
+			Version: "N/A",
+			Status:  false,
+		})
+	}
+	if len(mysqld.Tree) == 0 {
+		mysqld.Tree = append(mysqld.Tree, dash.Processus{
+			Name:    "mysqld",
+			PID:     0,
+			Version: "N/A",
+			Status:  false,
+		})
+	}
+	// Final Assignation
 	allProcess["Docker"] = docker
 	allProcess["Apache"] = httpd
+	allProcess["MySQL"] = mysqld
 	// allProcess["Others"] = otherProc
 
 	return allProcess

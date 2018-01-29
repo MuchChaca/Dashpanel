@@ -1,0 +1,23 @@
+
+
+src/controller/process_controller.go:
+	☐ kill service 									@high
+		☐ --> Check how to run sudo commands	@critical
+	☐ restart service 								@high 
+	☐ handle the version								@low 
+	fetch:
+		✔ mysqld @done (1/29/2018, 3:39:48 AM)
+		✔ docker @done (1/29/2018, 3:39:50 AM)
+		☐ nginx											@low 
+		☐ apache2 / httpd								@low
+		✘ apache2 @cancelled (1/29/2018, 3:43:14 AM) -- merged with httpd
+		☐ mongod											@critical 
+	handle stuff other than processuses:
+		☐ php
+		☐ go
+		☐ npm
+		☐ composer
+		☐ angular 1.X / 2.+
+
+
+emoji in vsc ?

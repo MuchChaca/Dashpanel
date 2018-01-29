@@ -45,7 +45,7 @@ func main() {
 		ws.Upgrade,
 	)
 	// controllers registration here
-	dashApp.Handle(new(controller.DashController))
+	dashApp.Handle(new(controller.ProcessController))
 
 	// start the web server at http://localhost:8080
 	app.Run(iris.Addr(":8080"), iris.WithoutVersionChecker)

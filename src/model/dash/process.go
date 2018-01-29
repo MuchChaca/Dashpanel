@@ -38,6 +38,9 @@ func (p *Processus) Start() error {
 
 // Stop the apache service
 func (p *Processus) Stop() error {
+	// new command
+	// cmd := exec.Command("kill", p.PID)
+
 	return nil
 }
 
