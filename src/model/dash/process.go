@@ -1,5 +1,12 @@
 package dash
 
+import (
+	"fmt"
+	"log"
+	"os/exec"
+	"strconv"
+)
+
 // // Process
 
 // Process is a process we can start or stop on the server
@@ -40,13 +47,19 @@ func (p *Processus) Start() error {
 func (p *Processus) Stop() error {
 	// new command
 	// cmd := exec.Command("kill", p.PID)
+	q := fmt.Sprintf("kill %s", p.GetPID())
+	cmd := exec.Command("sudo", "bash", q)
+	err := cmd.Run()
+	if err != nil {
+		log.Panicf("[ERROR]::Could not kill the process PID[%d]\n\t%v\n", p.PID, err)
+	}
 
 	return nil
 }
 
 // GetPID get the pid of the apache service
-func (p *Processus) GetPID() int {
-	return 0
+func (p *Processus) GetPID() string {
+	return strconv.Itoa(p.PID)
 }
 
 // GetVersion return the version of the apache service

@@ -3,6 +3,7 @@
 src/controller/process_controller.go:
 	☐ kill service 									@high
 		☐ --> Check how to run sudo commands	@critical
+			☐ --> Test this 							@today
 	☐ restart service 								@high 
 	☐ handle the version								@low 
 	fetch:
@@ -19,5 +20,5 @@ src/controller/process_controller.go:
 		☐ composer
 		☐ angular 1.X / 2.+
 
-
-emoji in vsc ?
+Others:
+	☐ emoji in vsc ?
