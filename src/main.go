@@ -44,8 +44,26 @@ func main() {
 		// sess.Start,
 		ws.Upgrade,
 	)
+
 	// controllers registration here
 	dashApp.Handle(new(controller.ProcessController))
+
+	// app.Party("/process", )
+
+	//* PartyFunc is working ! Yay !
+	app.PartyFunc("/process", func(process iris.Party) {
+		// users.Use(myAuthMiddlewareHandler)
+
+		// http://localhost:8080/users/42/profile
+		process.Put("/start/{name:string}", controller.StartProcess)
+		// http://localhost:8080/users/messages/1
+		// users.Get("/inbox/{id:int}", userMessageHandler)
+	})
+
+	/* process := app.Party("/process")
+	app.PartyFunc("/process", func (process iris.Party)) {
+		process.Put("/start/{name:string}", controller.ProcessController.StartProcess())
+	}) */
 
 	// start the web server at http://localhost:8080
 	app.Run(iris.Addr(":8080"), iris.WithoutVersionChecker)

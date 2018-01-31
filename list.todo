@@ -1,24 +1,31 @@
 
 
 src/controller/process_controller.go:
-	☐ kill service 									@high
+	☐ stop service 									@high
 		☐ --> Check how to run sudo commands	@critical
-			☐ --> Test this 							@today
+			✔ check what http verb to use to stop a service @done (1/30/2018, 4:00:22 AM)
+			☐ how to stop process without root @today
 	☐ restart service 								@high 
 	☐ handle the version								@low 
+	☐ refractor the Load process, less code?	@high 
+
 	fetch:
 		✔ mysqld @done (1/29/2018, 3:39:48 AM)
 		✔ docker @done (1/29/2018, 3:39:50 AM)
 		☐ nginx											@low 
 		☐ apache2 / httpd								@low
 		✘ apache2 @cancelled (1/29/2018, 3:43:14 AM) -- merged with httpd
-		☐ mongod											@critical 
+		✔ mongod @done (1/30/2018, 3:00:47 AM)
 	handle stuff other than processuses:
 		☐ php
 		☐ go
 		☐ npm
 		☐ composer
-		☐ angular 1.X / 2.+
+		☐ angular 1.X / 2.+ ?
+
+	Learn to use app.PartyFunc()?:
+		✔ Make it work on a party "/process" and PUT handler @done (1/31/2018, 4:09:44 AM)
+
 
 Others:
-	☐ emoji in vsc ?
+	✔ emoji in vsc ? @done (1/30/2018, 2:48:20 AM)
