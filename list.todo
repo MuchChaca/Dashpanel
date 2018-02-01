@@ -4,7 +4,7 @@ src/controller/process_controller.go:
 	☐ stop service 									@high
 		☐ --> Check how to run sudo commands	@critical
 			✔ check what http verb to use to stop a service @done (1/30/2018, 4:00:22 AM)
-			☐ how to stop process without root @today
+			☐ how to stop process without root 	@today
 	☐ restart service 								@high 
 	☐ handle the version								@low 
 	☐ refractor the Load process, less code?	@high 
@@ -29,3 +29,5 @@ src/controller/process_controller.go:
 
 Others:
 	✔ emoji in vsc ? @done (1/30/2018, 2:48:20 AM)
+
+	☐ REFRACTOR USING os.Process

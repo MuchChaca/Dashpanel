@@ -2,8 +2,10 @@ package dash
 
 import (
 	"bytes"
+	"errors"
 	"fmt"
 	"log"
+	"os"
 	"os/exec"
 	"regexp"
 	"strconv"
@@ -11,12 +13,13 @@ import (
 
 	"github.com/fatih/color"
 	"github.com/kataras/iris"
+	"github.com/markbates/grift/cmd"
 )
 
 // // Process
 
-// Process is a process we can start or stop on the server
-type Process interface {
+// DashedProcess is a process we can start or stop on the server
+type DashedProcess interface {
 	Init() error
 	Start() error
 	Stop() error
@@ -33,11 +36,12 @@ type Apache struct {
 }
 
 // Processus is just a simple processus
+// With description an PID
 type Processus struct {
-	Name    string `json:"name"`
-	PID     int    `json:"pid"`
-	Version string `json:"version"`
-	Status  bool   `json:"status"`
+	Name    string          `json:"name"`
+	Process os.Process      `json:"process"`
+	Version string          `json:"version"`
+	State   os.ProcessState `json:"state"`
 }
 
 // TreeProcess is the "arborescence" all processussesssss
@@ -50,12 +54,26 @@ func (p *Processus) Init() error {
 	//TODO: Make first the func that fetch all process
 	//TODO Then look for it in the slice returned by the fetch
 	//TODO Init to 0 value if it's not there
+
 	return nil
 }
 
 // Start the apache service
+//* Uses PUT method
+//? type os.Process
 func (p *Processus) Start() error {
-	return nil
+	if !p.Status {
+		// Starts the stuff
+		/* q := fmt.Sprintf("systemctl start %s", p.Name)
+		cmd := exec.Command("sudo", "bash", q) */
+		// cmd := exec.Command(q)
+		err := cmd.Run()
+		if err != nil {
+			return err
+		}
+
+	}
+	return errors.New("Could not start the processus " + p.Name)
 }
 
 // Stop is the action to stop the apache service
@@ -68,15 +86,15 @@ func (p *Processus) Stop() error {
 	cmd := exec.Command("sudo", "bash", q)
 	err := cmd.Run()
 	if err != nil {
-		log.Panicf("[ERROR]::Could not kill the process PID[%d]\n\t%v\n", p.PID, err)
+		log.Panicf("[ERROR]::Could not kill the process PID[%d]\n\t%v\n", p.Process.Pid, err)
 	}
 
 	return nil
 }
 
-// GetPID get the pid of the apache service
+// GetPID get the pid of the service as a stringS
 func (p *Processus) GetPID() string {
-	return strconv.Itoa(p.PID)
+	return strconv.Itoa(p.Process.Pid)
 }
 
 // GetVersion return the version of the apache service
@@ -99,7 +117,7 @@ func (p *Processus) GetStatus() bool {
 // 	items map[string]
 // }
 
-//= NON ATTACHED METHODS
+//=== - NON ATTACHED METHODS -===\\
 
 // LoadProcess loads the processes
 func LoadProcess() iris.Map {
@@ -152,7 +170,7 @@ func LoadProcess() iris.Map {
 
 		aProcess := Processus{
 			Name:    processusName,
-			PID:     processusPID,
+			Process: os.Process{Pid: processusPID},
 			Version: "N/A",
 			Status:  true,
 		}
@@ -179,7 +197,7 @@ func LoadProcess() iris.Map {
 	if len(dockerd.Tree) == 0 {
 		dockerd.Tree = append(dockerd.Tree, Processus{
 			Name:    "dockerd",
-			PID:     0,
+			Process: os.Process{Pid: 0},
 			Version: "N/A",
 			Status:  false,
 		})
@@ -187,7 +205,7 @@ func LoadProcess() iris.Map {
 	if len(httpd.Tree) == 0 {
 		httpd.Tree = append(httpd.Tree, Processus{
 			Name:    "httpd",
-			PID:     0,
+			Process: os.Process{Pid: 0},
 			Version: "N/A",
 			Status:  false,
 		})
@@ -195,7 +213,7 @@ func LoadProcess() iris.Map {
 	if len(mysqld.Tree) == 0 {
 		mysqld.Tree = append(mysqld.Tree, Processus{
 			Name:    "mysqld",
-			PID:     0,
+			Process: os.Process{Pid: 0},
 			Version: "N/A",
 			Status:  false,
 		})
@@ -203,7 +221,7 @@ func LoadProcess() iris.Map {
 	if len(mongod.Tree) == 0 {
 		mongod.Tree = append(mongod.Tree, Processus{
 			Name:    "mongod",
-			PID:     0,
+			Process: os.Process{Pid: 0},
 			Version: "N/A",
 			Status:  false,
 		})

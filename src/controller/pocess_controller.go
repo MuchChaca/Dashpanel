@@ -1,6 +1,8 @@
 package controller
 
 import (
+	"log"
+
 	"github.com/MuchChaca/Dashpanel/src/model/dash"
 
 	"github.com/kataras/iris"
@@ -36,6 +38,15 @@ func (c *ProcessController) Get() iris.Map {
 
 // StartProcess does what it is named after
 func StartProcess(ctx iris.Context) {
+	//// FetchProcess(ctx.Params().GetEscape("name")) // returns an error?
+	proc := dash.Processus{
+		Name:   ctx.Params().GetEscape("name"),
+		Status: false,
+	}
+	err := proc.Start()
+	if err != nil {
+		log.Println("[process_controller]46::StartingProcess", err)
+	}
 	ctx.Writef("Starting %v . . .\n", ctx.Params().GetEscape("name"))
 }
 
